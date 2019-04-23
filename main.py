@@ -1,49 +1,26 @@
-import datetime
-
-import requests
 import boto3
-from botocore.exceptions import ClientError
+
+from pzdata.urltos3 import S3UrlImporter
+from pzdata.wrangler import Ml100kWrangler
 
 
+# TODO: Tie it all together
+'''
 SOURCE_DATA_URL = 'http://files.grouplens.org/datasets/movielens/ml-100k.zip'
 TEMP_S3_BUCKET = 'pzdata-temp-' + boto3.client('sts').get_caller_identity().get('Account')
+DEST_KEY = '2019-04-23T04:02:25-pzdata.csv'
+SOURCE_KEY = '2019-04-23T04:02:25-ml-100k.zip'
+DEST_KEY = '2019-04-23T04:02:25-pzdata.csv'
 
+s3UrlImporter = S3UrlImporter(SOURCE_DATA_URL, TEMP_S3_BUCKET)
+s3UrlImporter.destroy_bucket()
+response = s3UrlImporter.url_to_s3()
 
-# TODO: Download datafile from URL to S3 bucket
-def url_to_s3(url, bucket_name):
-    S3_KEY = url.split('/')[-1]
-    r = requests.get(url, stream=True)
+ML100K_KEY = response.split('/')[-1]
 
-    try:
-        s3 = boto3.resource('s3')
-        bucket = s3.Bucket(bucket_name)
-
-        if bucket.creation_date:
-            response = bucket.objects.all().delete()
-            print(response)
-            response = bucket.delete()
-            print(response)
-        
-        response = bucket.create()
-        print(response)
-
-        response = bucket.upload_fileobj(r.raw, S3_KEY)
-        print(response)
-    
-    except:
-        print(ClientError)
-
-
-
-
-
-# TODO: Wrangle user data into Personalize Format
-
-# TODO: Create a Personaize campaign
-
-#print(datetime.datetime.utcnow())
-
-url_to_s3(SOURCE_DATA_URL, TEMP_S3_BUCKET)
+ml100Wrangler = Ml100kWrangler(BUCKET, SOURCE_KEY, DEST_KEY)
+ml100Wrangler.pzdata_etl()
+'''
 
 
 ''' print('Hi')
