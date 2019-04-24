@@ -24,8 +24,8 @@ class S3UrlImporter:
             print(ClientError)
 
     def url_to_s3(self):
-        TIMESTAMP = datetime.datetime.utcnow().isoformat(timespec='seconds')
-        S3_KEY = TIMESTAMP + '-' + self.url.split('/')[-1]
+        timestamp = datetime.datetime.utcnow().isoformat(timespec='seconds')
+        s3_key = timestamp + '-' + self.url.split('/')[-1]
         
         r = requests.get(self.url, stream=True)
         mb = '{:.1f}'.format((int(r.headers.get('content-length')) / 1048576))
@@ -38,10 +38,10 @@ class S3UrlImporter:
             print('[url_to_s3] ' + self.bucket_name + ' created.')
 
             print('[url_to_s3] Transferring file of size ' + mb + ' MB...')
-            bucket.upload_fileobj(r.raw, S3_KEY)
+            bucket.upload_fileobj(r.raw, s3_key)
             print('[url_to_s3] Done.')
 
-            return self.bucket_name + '/' + S3_KEY
+            return s3_key
         
         except:
             print(ClientError)
